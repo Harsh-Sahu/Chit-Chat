@@ -2,6 +2,8 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const Messages = require("../models/messageModel");
 const sgMail = require("@sendgrid/mail");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 module.exports.login = async (req, res, next) => {
   try {
@@ -88,7 +90,17 @@ module.exports.lockList = async (req, res, next) => {
   }
 };
 
-const API_KEY = "";
+// const API_KEY =
+//   "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";
+
+let transporter = nodemailer.createTransport({
+  service: "hotmail",
+  auth: {
+    user: process.env.user,
+    pass: process.env.pass,
+  },
+});
+
 module.exports.unlockList = async (req, res, next) => {
   try {
     // console.log(req.params.id);
@@ -97,18 +109,34 @@ module.exports.unlockList = async (req, res, next) => {
     console.log(user[0].email);
 
     let OTP = Math.floor(Math.random() * 1000000 + 1);
-    sgMail.setApiKey(API_KEY);
-    const msg = {
+
+    // sgMail.setApiKey(API_KEY);
+
+    let mailOptions = {
+      from: "chitchatapp101@outlook.com",
       to: user[0].email,
-      from: "harshsahuhs1994@gmail.com",
       subject: "OTP for Chit-Chat",
-      text: "Your otp to unlock " + user[0].username + "chat is : " + OTP,
+      text: "Your otp to unlock " + user[0].username + " chat is : " + OTP,
     };
 
-    sgMail
-      .send(msg)
-      .then((res) => console.log("email sent"))
-      .catch((err) => console.log(err.message));
+    transporter.sendMail(mailOptions, function (err) {
+      if (err) {
+        console.log("Error Occured", err);
+      } else {
+        console.log("Email sent");
+      }
+    });
+    // const msg = {
+    //   to: user[0].email,
+    //   from: "rushi022002@gmail.com",
+    //   subject: "OTP for Chit-Chat",
+    //   text: "Your otp to unlock " + user[0].username + "chat is : " + OTP,
+    // };
+
+    // sgMail
+    //   .send(msg)
+    //   .then((res) => console.log("email sent"))
+    //   .catch((err) => console.log(err.message));
 
     return res.json({
       otp: OTP,

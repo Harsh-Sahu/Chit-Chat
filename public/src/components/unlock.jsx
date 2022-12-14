@@ -23,7 +23,7 @@ export default function Lock({ currentChat}) {
         to: currentChat._id,
         work : "unlock",
       });
-      console.log(typeof data.otp);
+      console.log(data.otp);
     let password = prompt("Enter the OTP sent on your register Email");
     if(+password===data.otp)
     {
